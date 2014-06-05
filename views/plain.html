@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="javascripts/firmataF5529.js"></script>
+
+	<h1>Firmata MSP430F5529</h1>
+
+	<div>
+		<div>Temperature:</div>
+		<div class="TemperatureReading"></div>
+	</div>
+	
+
+	<button id="ledButton">Toggle LED</button>
+
+	
+	<!--<script>
+		$('#myButton').click(function(e)
+		{
+			$.post("/helloworld", function( data ) {
+				console.log(data);
+				$( ".result, h1" ).html( data.temperature );
+			});
+		});
+	</script>-->
+	
+</body>
+</html>
