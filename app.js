@@ -57,20 +57,40 @@ app.use(function(err, req, res, next) {
 var server = app.listen(3000);
 
 var temperatureReading = 0;
-var firmata = require('./lib/firmata');
-// var launchpad = require('./lib/launchpad');
+//var firmata = require('./lib/firmata');
+var launchpad = require('./lib/launchpad');
 // Enabled socket.io. Disabled server creation in www/bin
-
-
-
-console.log(new Date());
-
-
 
 var io = require('socket.io').listen(server);
 
-var launchpad = {
+var serialPort = require("serialport");
+//var five = require("johnny-five"), board = new five.Board();
+
+var availablePorts = {};
+serialPort.list(function (err, ports) {
+    availablePorts = ports;
+  // ports.forEach(function(port) {
+  //   console.log(port.comName);
+  //   console.log(port.pnpId);
+  //   console.log(port.manufacturer);
+  // });
+});
+
+io.on('connection',function(socket){
+    console.log('a user connected');
+    socket.emit('listPort', availablePorts);
+    socket.on('connectPort',function(selectedPort){
+        launchpad.initialize(socket, selectedPort);
+    });
+    //launchpad.readTemperature(socket);
+    launchpad.toggleLED(socket);
+    launchpad.populatePins(socket);
+    
+});
+
+/*var launchpad = {
     initialize: function(){
+        console.log('initializing');
         var board = new firmata.Board('COM9', function(err) {
             console.log(new Date());
             if (err) {
@@ -81,12 +101,32 @@ var launchpad = {
 
             console.log('Firmware: ' + board.firmware.name + '-' + board.firmware.version.major + '.' + board.firmware.version.minor);
 
+        io.on('connection', function(socket){
+            console.log('a user connected');
+            var ledOn = 0;
+            board.pinMode(43, board.MODES.OUTPUT);
+
+            socket.on('toggleLED', function(){
+                console.log('toggleLED:'+ledOn);
+
+                if (ledOn) {
+                    console.log('+');
+                    board.digitalWrite(43, board.HIGH);
+                }
+                else {
+                    console.log('-');
+                    board.digitalWrite(43, board.LOW);
+                }
+
+                ledOn = !ledOn;
+                    
+            });
+        });
+
         });
     },
 
-};
+};*/
 
-console.log(typeof launchpad.initialize);
-launchpad.initialize();
 
 module.exports = app;
