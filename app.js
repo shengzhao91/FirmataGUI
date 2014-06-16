@@ -85,6 +85,7 @@ io.on('connection',function(socket){
     //launchpad.readTemperature(socket);
     launchpad.toggleLED(socket);
     launchpad.populatePins(socket);
+    launchpad.togglePin(socket);
     
 });
 

@@ -14,10 +14,11 @@
 		<div>Temperature:</div>
 		<div class="TemperatureReading"></div>
 	</div>
+
+	<div>0<input type="range" name="points" min="0" max="255" onChange="console.log('value:'+this.value)">255</div>
 	
 
 	<button id="ledButton">Toggle LED</button>
-
 
 	<button id="populatePinsButton">Populate Pins</button>
 	<div id="pinDiv"></div>
