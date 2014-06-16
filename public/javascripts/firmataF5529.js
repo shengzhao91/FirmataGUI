@@ -41,12 +41,75 @@ $(document).ready(function() {
 		socket.emit('populatePinsRequest');
 	});
 
-	socket.on('boardObjectResponse',function(boardObject){
-		board = boardObject; // bring board object to client side
+	// socket.on('boardObjectResponse',function(boardObject){
+	// 	board = boardObject; // bring board object to client side
+	// });
+
+	// Initialize #pinDiv on client
+	var initPinDiv = function(board){
+		$.each(board.pins, function(index, pin){
+			// create div structure for each pin
+			$pinContainer = $('<div></div>').html('pin'+index).attr({'id':'pin'+index,'value':index,'style':'display: -webkit-box'});
+			$pinContainer.append($('<select name="select' +index+'"></select>'));
+			$pinContainer.append($('<div class="pin-utility"></div>'));
+			$pinDiv.append($pinContainer);
+
+
+			// dropdown selector
+			$selectDropdown = $('select[name="select' +index + '"]');
+
+			// populate select box
+			$.each(pin.supportedModes, function(modeIndex,modeValue){
+				$optionText = $('<option></option>');
+
+				if (modeValue==board.MODES.INPUT){
+					$selectDropdown.append( $optionText.html('Input').val(board.MODES.INPUT) );
+					$('#pin'+index+' .pin-utility').html('LOW');
+				}
+				if (modeValue==board.MODES.OUTPUT){
+
+					if (modeValue == pin.mode) {$optionText.attr('selected',true);}
+						
+					$selectDropdown.append( $optionText.html('Output').val(board.MODES.OUTPUT) );
+					$('#pin'+index+' .pin-utility').html('<button>LOW</button>');
+				}
+				if (modeValue==board.MODES.ANALOG){
+					if (modeValue == pin.mode) {$optionText.attr('selected',true);}
+					
+					$selectDropdown.append( $optionText.html('Analog').val(board.MODES.ANALOG) );
+					$('#pin'+index+' .pin-utility').html(pin.value);
+				}
+				if (modeValue==board.MODES.PWM){
+					$selectDropdown.append( $optionText.html('PWM').val(board.MODES.PWM) );
+				}
+				if (modeValue==board.MODES.SERVO){
+					$selectDropdown.append( $optionText.html('Servo').val(board.MODES.SERVO) );
+				}
+					
+			});
+
+
+
+		});
+	};
+
+	// var initTargetPinMode = function(board){
+	// 	var analogPinNums = board.analogPins;
+	// 	$.each(analogPinNums, function(index,analogPinNum){
+	// 		board.pins[analogPinNum]
+	// 	});
+	// };
+
+	socket.on('populatePinsRespond',function(board){
+		$pinDiv = $('#pinDiv');
+		$pinDiv.html(''); // empty existing pinDiv
+		myboard = board;
+		initPinDiv(board);			//initialize #pinDiv structure on client
+		//initTargetPinMode(board);	//initialize pin mode on target
+		
 	});
 
-
-
+/*
 	socket.on('populatePinsRespond',function(pinsList){
 		console.log(pinsList.length);
 		//debug = pinsList;
@@ -75,14 +138,27 @@ $(document).ready(function() {
 
 
 			$('#pin'+index).append($('<select name="select' +index+'"></select>').attr('id','pin'+index+'select'));
+
+			// on select change
 			$('#pin'+index+' select').change(function() {
 					var selectedMode = $(this).find('option:selected').html();
 					var selectedID = $(this).attr('id');
 					console.log(selectedID + ': ' + selectedMode);
 					if (selectedMode == 'Input'){
 						$('#pin'+index+'util').html('LOW');
+						console.log('Read pin'+index);
+						socket.emit('digitalReadReq',index);
+						socket.on('digitalReadRes',function(value){
+							console.log('digitalReadRes: ' + value);
+							if (value == 0)
+								$('#pin'+index+'util').html('LOW');
+							else
+								$('#pin'+index+'util').html('HIGH');
+						});
 					} else if (selectedMode == 'Output'){
 						$('#pin'+index+'util').html('<button>LOW</button>');
+						socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.OUTPUT}); 
+
 					} else if (selectedMode == 'Analog'){
 						$('#pin'+index+'util').html(pins.value);
 					} else {
@@ -93,6 +169,7 @@ $(document).ready(function() {
 			// create pinXutil div
 			$('#pin'+index).append($('<div></div>').attr('id','pin'+index+'util'));
 
+			// populate select box
 			$.each(pins.supportedModes, function(modeIndex,modeValue){
 				if (modeValue==0){
 					$('#pin'+index+'select').append('<option>Input</option>');
@@ -118,6 +195,7 @@ $(document).ready(function() {
 
 		});
 	});
+*/
 
 	$('#initButton').click(function(e){
 		
@@ -144,3 +222,12 @@ $(document).ready(function() {
 	});
 
 });
+
+// Pin structure
+// <div id="pin2" value="2" style="display: -webkit-box">
+// pin2
+// <select name="select2">
+// 	<option value="0">INPUT</option>
+// </select>
+// <div class=".pin-utility"></div>
+// </div>

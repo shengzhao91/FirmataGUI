@@ -86,6 +86,7 @@ io.on('connection',function(socket){
     launchpad.toggleLED(socket);
     launchpad.populatePins(socket);
     launchpad.togglePin(socket);
+    launchpad.digitalRead(socket);
     
 });
 
