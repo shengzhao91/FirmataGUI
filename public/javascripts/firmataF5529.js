@@ -63,35 +63,87 @@ $(document).ready(function() {
 				$optionText = $('<option></option>');
 
 				if (modeValue==board.MODES.INPUT){
+					if (modeValue == pin.mode) {
+						$optionText.attr('selected',true);
+						$('#pin'+index+' .pin-utility').html(pin.value?'HIGH':'LOW');
+					}
 					$selectDropdown.append( $optionText.html('Input').val(board.MODES.INPUT) );
-					$('#pin'+index+' .pin-utility').html('LOW');
 				}
 				if (modeValue==board.MODES.OUTPUT){
-
-					if (modeValue == pin.mode) {$optionText.attr('selected',true);}
-						
+					if (modeValue == pin.mode) {
+						$optionText.attr('selected',true);
+						$('#pin'+index+' .pin-utility').html('<button>LOW</button>');
+					}
 					$selectDropdown.append( $optionText.html('Output').val(board.MODES.OUTPUT) );
-					$('#pin'+index+' .pin-utility').html('<button>LOW</button>');
 				}
 				if (modeValue==board.MODES.ANALOG){
-					if (modeValue == pin.mode) {$optionText.attr('selected',true);}
-					
+					if (modeValue == pin.mode) {
+						$optionText.attr('selected',true);
+						$('#pin'+index+' .pin-utility').html(pin.value);
+					}
 					$selectDropdown.append( $optionText.html('Analog').val(board.MODES.ANALOG) );
-					$('#pin'+index+' .pin-utility').html(pin.value);
 				}
 				if (modeValue==board.MODES.PWM){
+					if (modeValue == pin.mode) {
+						$optionText.attr('selected',true);
+					}
 					$selectDropdown.append( $optionText.html('PWM').val(board.MODES.PWM) );
 				}
 				if (modeValue==board.MODES.SERVO){
+					if (modeValue == pin.mode) {
+						$optionText.attr('selected',true);
+					}
 					$selectDropdown.append( $optionText.html('Servo').val(board.MODES.SERVO) );
 				}
 					
+			});
+
+			$selectDropdown.change(function() {
+				var selectedMode = $(this).find('option:selected').html();
+				debug = pin;
+				var selectedName = $(this).attr('name');
+				console.log(selectedName + ': ' + selectedMode + ', index:'+index);
+				if (selectedMode == 'Input'){
+					// TO-DO: pin.value only updates after clicking populate pins.
+					$('#pin'+index+' .pin-utility').html(pin.value?'HIGH':'LOW'); //read pin value
+					console.log('DigitalRead pin'+index);
+					socket.emit('digitalReadReq',index);
+					socket.on('digitalReadRes',function(data){
+						console.log('digitalReadRes: pin' + data.pinNum + ' - ' + data.value);
+						$('#pin'+data.pinNum+' .pin-utility').html(data.value?'HIGH':'LOW');
+					});
+				} else if (selectedMode == 'Output'){
+					$('#pin'+index+' .pin-utility').html('<button>LOW</button>');
+					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.OUTPUT}); 
+
+				} else if (selectedMode == 'Analog'){
+					$('#pin'+index+' .pin-utility').html(pin.value);
+					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.ANALOG});
+				} else {
+					$('#pin'+index+' .pin-utility').html('0<input type="range" name="points" min="0" max="255" onChange="console.log(this.value)">255');
+				}
+			});
+
+			// OUTPUT button logic
+			$('#pin'+index).on('click',  'button', function(event){
+				console.log('clicked');
+				if($(this).html() == 'HIGH') {
+					$(this).html('LOW');
+					socket.emit('togglePin',
+						{ pinNum:$(this).parent().parent().attr('value'), value: 0} );
+				} else {
+					$(this).html('HIGH');
+					socket.emit('togglePin',
+						{ pinNum:$(this).parent().parent().attr('value'), value: 1} );
+				}
 			});
 
 
 
 		});
 	};
+
+	
 
 	// var initTargetPinMode = function(board){
 	// 	var analogPinNums = board.analogPins;
