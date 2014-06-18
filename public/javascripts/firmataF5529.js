@@ -45,6 +45,11 @@ $(document).ready(function() {
 	// 	board = boardObject; // bring board object to client side
 	// });
 
+	socket.on('analogReadRes', function(data){
+		console.log('analogReadRes: pin' + data.pinNum + ' - ' + data.value);
+		$('#pin'+data.pinNum+' .pin-utility').html(data.value);
+	});
+
 	// Initialize #pinDiv on client
 	var initPinDiv = function(board){
 		$.each(board.pins, function(index, pin){
@@ -107,6 +112,7 @@ $(document).ready(function() {
 					// TO-DO: pin.value only updates after clicking populate pins.
 					$('#pin'+index+' .pin-utility').html(pin.value?'HIGH':'LOW'); //read pin value
 					console.log('DigitalRead pin'+index);
+					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.INPUT}); 
 					socket.emit('digitalReadReq',index);
 					socket.on('digitalReadRes',function(data){
 						console.log('digitalReadRes: pin' + data.pinNum + ' - ' + data.value);
@@ -119,6 +125,8 @@ $(document).ready(function() {
 				} else if (selectedMode == 'Analog'){
 					$('#pin'+index+' .pin-utility').html(pin.value);
 					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.ANALOG});
+					//socket.emit('analogReadReq',{pinNum:index, analogPinNum:pin.analogChannel}); //pin.analogChannel
+					
 				} else {
 					$('#pin'+index+' .pin-utility').html('0<input type="range" name="points" min="0" max="255" onChange="console.log(this.value)">255');
 				}

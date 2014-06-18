@@ -81,12 +81,15 @@ io.on('connection',function(socket){
     socket.emit('listPort', availablePorts);
     socket.on('connectPort',function(selectedPort){
         launchpad.initialize(socket, selectedPort);
+
+        //launchpad.analogRead(socket);
     });
     //launchpad.readTemperature(socket);
     launchpad.toggleLED(socket);
     launchpad.populatePins(socket);
     launchpad.togglePin(socket);
     launchpad.digitalRead(socket);
+    
     launchpad.pinMode(socket);
 });
 
