@@ -3,39 +3,6 @@ $(document).ready(function() {
 
 	var socket = io();
 
-	// var i;
-	// var digitalReadWritePins = [1, 2, 3, 4, 5, 10];
-	// var analogReadPins = [6,7,8];
-	// var analogWritePins = [1,9];
-	// var optionText = '';
-	// for (i=1;i<=10;i++)
-	// {
-		
-	// 	$('#pinDiv').append(
-	// 		$('<div></div>').html('pin'+i).attr({'id':'pin'+i,'value':i})
-	// 	);
-
-	// 	$('#pin'+i).append($('<select></select>').attr('id','pin'+i+'select'));
-	// 	if (-1 != $.inArray(i,digitalReadWritePins) )
-	// 	{
-	// 		$('#pin'+i+'select').append('<option>Input</option>');
-	// 		$('#pin'+i+'select').append('<option>Output</option>');
-	// 	}
-	// 	if (-1 != $.inArray(i,analogReadPins) )
-	// 	{
-	// 		$('#pin'+i+'select').append('<option>analogRead</option>');
-	// 	}
-	// 	if (-1 != $.inArray(i,analogWritePins) )
-	// 	{
-	// 		$('#pin'+i+'select').append('<option>analogWrite</option>');
-	// 	}
-	// }
-
-	// $.each($('#pinDiv').children(),function(index,value){
-	// 	console.log(value);
-	// 	//value.html('asdfh;');
-	// });
-
 	$('#populatePinsButton').click(function(e){
 		console.log('Populate Pins');
 		socket.emit('populatePinsRequest');
@@ -47,7 +14,12 @@ $(document).ready(function() {
 
 	socket.on('analogReadRes', function(data){
 		console.log('analogReadRes: pin' + data.pinNum + ' - ' + data.value);
-		$('#pin'+data.pinNum+' .pin-utility').html(data.value);
+		$('#pin'+data.pinNum+' .pin-analog').html(data.value);
+	});
+
+	socket.on('digitalReadRes',function(data){
+		console.log('digitalReadRes: pin' + data.pinNum + ' - ' + data.value);
+		$('#pin'+data.pinNum+' .pin-input').html(data.value?'HIGH':'LOW');
 	});
 
 	// Initialize #pinDiv on client
@@ -56,7 +28,11 @@ $(document).ready(function() {
 			// create div structure for each pin
 			$pinContainer = $('<div></div>').html('pin'+index).attr({'id':'pin'+index,'value':index,'style':'display: -webkit-box'});
 			$pinContainer.append($('<select name="select' +index+'"></select>'));
-			$pinContainer.append($('<div class="pin-utility"></div>'));
+			$pinContainer.append($('<div class="pin-analog"></div>').hide());
+			$pinContainer.append($('<div class="pin-input"></div>').hide());
+			$pinContainer.append($('<div class="pin-output"></div>').hide());
+			$pinContainer.append($('<div class="pin-pwm"></div>').hide());
+			$pinContainer.append($('<div class="pin-servo"></div>').hide());
 			$pinDiv.append($pinContainer);
 
 
@@ -68,23 +44,26 @@ $(document).ready(function() {
 				$optionText = $('<option></option>');
 
 				if (modeValue==board.MODES.INPUT){
+					$('#pin'+index+' .pin-input').html(pin.value?'HIGH':'LOW');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
-						$('#pin'+index+' .pin-utility').html(pin.value?'HIGH':'LOW');
+						$('#pin'+index+' .pin-input').show();
 					}
 					$selectDropdown.append( $optionText.html('Input').val(board.MODES.INPUT) );
 				}
 				if (modeValue==board.MODES.OUTPUT){
+					$('#pin'+index+' .pin-output').html('<button>LOW</button>');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
-						$('#pin'+index+' .pin-utility').html('<button>LOW</button>');
+						$('#pin'+index+' .pin-output').show();
 					}
 					$selectDropdown.append( $optionText.html('Output').val(board.MODES.OUTPUT) );
 				}
 				if (modeValue==board.MODES.ANALOG){
+					$('#pin'+index+' .pin-analog').html(pin.value);
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
-						$('#pin'+index+' .pin-utility').html(pin.value);
+						$('#pin'+index+' .pin-analog').show();
 					}
 					$selectDropdown.append( $optionText.html('Analog').val(board.MODES.ANALOG) );
 				}
@@ -95,8 +74,10 @@ $(document).ready(function() {
 					$selectDropdown.append( $optionText.html('PWM').val(board.MODES.PWM) );
 				}
 				if (modeValue==board.MODES.SERVO){
+					$('#pin'+index+' .pin-servo').html('0<input type="range" name="points" min="0" max="255" onChange="console.log(this.value)">255');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
+						$('#pin'+index+' .pin-servo').show();
 					}
 					$selectDropdown.append( $optionText.html('Servo').val(board.MODES.SERVO) );
 				}
@@ -110,25 +91,21 @@ $(document).ready(function() {
 				console.log(selectedName + ': ' + selectedMode + ', index:'+index);
 				if (selectedMode == 'Input'){
 					// TO-DO: pin.value only updates after clicking populate pins.
-					$('#pin'+index+' .pin-utility').html(pin.value?'HIGH':'LOW'); //read pin value
+					$('#pin'+index+' .pin-input').show().siblings("div").hide(); 
 					console.log('DigitalRead pin'+index);
 					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.INPUT}); 
-					socket.emit('digitalReadReq',index);
-					socket.on('digitalReadRes',function(data){
-						console.log('digitalReadRes: pin' + data.pinNum + ' - ' + data.value);
-						$('#pin'+data.pinNum+' .pin-utility').html(data.value?'HIGH':'LOW');
-					});
+					//socket.emit('digitalReadReq',index);
 				} else if (selectedMode == 'Output'){
-					$('#pin'+index+' .pin-utility').html('<button>LOW</button>');
+					$('#pin'+index+' .pin-output').show().siblings("div").hide();
 					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.OUTPUT}); 
 
 				} else if (selectedMode == 'Analog'){
-					$('#pin'+index+' .pin-utility').html(pin.value);
+					$('#pin'+index+' .pin-analog').show().siblings("div").hide();
 					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.ANALOG});
 					//socket.emit('analogReadReq',{pinNum:index, analogPinNum:pin.analogChannel}); //pin.analogChannel
 					
 				} else {
-					$('#pin'+index+' .pin-utility').html('0<input type="range" name="points" min="0" max="255" onChange="console.log(this.value)">255');
+					$('#pin'+index+' .pin-servo').show().siblings("div").hide();
 				}
 			});
 
@@ -169,94 +146,6 @@ $(document).ready(function() {
 		
 	});
 
-/*
-	socket.on('populatePinsRespond',function(pinsList){
-		console.log(pinsList.length);
-		//debug = pinsList;
-		$pinDiv = $('#pinDiv');
-		$pinDiv.html('');
-		// populate the pins based on what target returns
-		$.each(pinsList, function(index, pins){
-			$pinDiv.append(
-				$('<div></div>').html('pin'+index).attr({'id':'pin'+index,'value':index,'style':'display: -webkit-box'})
-			);
-
-
-			// attach event to Output HIGH/LOW. Control pin's value
-			$('#pin'+index).on('click',  'button', function(event){
-				console.log('clicked');
-				if($(this).html() == 'HIGH') {
-					$(this).html('LOW');
-					socket.emit('togglePin',
-						{ pinNum:$(this).parent().parent().attr('value'), value: 0} );
-				} else {
-					$(this).html('HIGH');
-					socket.emit('togglePin',
-						{ pinNum:$(this).parent().parent().attr('value'), value: 1} );
-				}
-			});
-
-
-			$('#pin'+index).append($('<select name="select' +index+'"></select>').attr('id','pin'+index+'select'));
-
-			// on select change
-			$('#pin'+index+' select').change(function() {
-					var selectedMode = $(this).find('option:selected').html();
-					var selectedID = $(this).attr('id');
-					console.log(selectedID + ': ' + selectedMode);
-					if (selectedMode == 'Input'){
-						$('#pin'+index+'util').html('LOW');
-						console.log('Read pin'+index);
-						socket.emit('digitalReadReq',index);
-						socket.on('digitalReadRes',function(value){
-							console.log('digitalReadRes: ' + value);
-							if (value == 0)
-								$('#pin'+index+'util').html('LOW');
-							else
-								$('#pin'+index+'util').html('HIGH');
-						});
-					} else if (selectedMode == 'Output'){
-						$('#pin'+index+'util').html('<button>LOW</button>');
-						socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.OUTPUT}); 
-
-					} else if (selectedMode == 'Analog'){
-						$('#pin'+index+'util').html(pins.value);
-					} else {
-						$('#pin'+index+'util').html('0<input type="range" name="points" min="0" max="255" onChange="console.log(this.value)">255');
-					}
-				});
-
-			// create pinXutil div
-			$('#pin'+index).append($('<div></div>').attr('id','pin'+index+'util'));
-
-			// populate select box
-			$.each(pins.supportedModes, function(modeIndex,modeValue){
-				if (modeValue==0){
-					$('#pin'+index+'select').append('<option>Input</option>');
-					$('#pin'+index+'util').html('LOW');
-				}
-				if (modeValue==1){
-					$('#pin'+index+'select').append('<option selected>Output</option>');
-					$('#pin'+index+'util').html('<button>LOW</button>');
-				}
-				if (modeValue==2){
-					$('#pin'+index+'select').append('<option selected>Analog</option>');
-					$('#pin'+index+'util').html(pins.value);
-				}
-				if (modeValue==3){
-					$('#pin'+index+'select').append('<option>PWM</option>');
-				}
-				if (modeValue==4){
-					$('#pin'+index+'select').append('<option>Servo</option>');
-				}
-					
-			});
-			
-
-		});
-	});
-*/
-
 	$('#initButton').click(function(e){
 		
 		var selectedPort = $('#portListSelect :selected').text();
@@ -289,5 +178,9 @@ $(document).ready(function() {
 // <select name="select2">
 // 	<option value="0">INPUT</option>
 // </select>
-// <div class=".pin-utility"></div>
+// <div class=".pin-analog"></div>
+// <div class=".pin-input"></div>
+// <div class=".pin-output"></div>
+// <div class=".pin-pwm"></div>
+// <div class=".pin-servo"></div>
 // </div>
