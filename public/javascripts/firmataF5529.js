@@ -74,7 +74,7 @@ $(document).ready(function() {
 					$selectDropdown.append( $optionText.html('PWM').val(board.MODES.PWM) );
 				}
 				if (modeValue==board.MODES.SERVO){
-					$('#pin'+index+' .pin-servo').html('0<input type="range" name="points" min="0" max="255" onChange="console.log(this.value)">255');
+					$('#pin'+index+' .pin-servo').html('0<input name="servo" type="range" name="points" min="0" max="180">180');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
 						$('#pin'+index+' .pin-servo').show();
@@ -86,7 +86,6 @@ $(document).ready(function() {
 
 			$selectDropdown.change(function() {
 				var selectedMode = $(this).find('option:selected').html();
-				debug = pin;
 				var selectedName = $(this).attr('name');
 				console.log(selectedName + ': ' + selectedMode + ', index:'+index);
 				if (selectedMode == 'Input'){
@@ -106,6 +105,7 @@ $(document).ready(function() {
 					
 				} else {
 					$('#pin'+index+' .pin-servo').show().siblings("div").hide();
+					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.SERVO});
 				}
 			});
 
@@ -121,6 +121,14 @@ $(document).ready(function() {
 					socket.emit('togglePin',
 						{ pinNum:$(this).parent().parent().attr('value'), value: 1} );
 				}
+			});
+
+			$('#pin'+index+' .pin-servo input[name=servo]').change(function(event){
+				debug = this;
+				var pinNum = Number( $(debug).parent().parent().attr('value') );
+				var degree = $(this).val();
+				console.log('servo pin' + pinNum + ', degree: ' + degree);
+				socket.emit('servoWriteReq',{pin:pinNum, degree:degree});
 			});
 
 

@@ -90,6 +90,7 @@ io.on('connection',function(socket){
     launchpad.togglePin(socket);
     //launchpad.digitalRead(socket);
     
+    launchpad.servoWrite(socket);
     launchpad.pinMode(socket);
 });
 
