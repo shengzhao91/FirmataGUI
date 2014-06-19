@@ -68,8 +68,10 @@ $(document).ready(function() {
 					$selectDropdown.append( $optionText.html('Analog').val(board.MODES.ANALOG) );
 				}
 				if (modeValue==board.MODES.PWM){
+					$('#pin'+index+' .pin-pwm').html('0<input name="pwm" type="range" name="points" min="0" max="255">255');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
+						$('#pin'+index+' .pin-pwm').show();
 					}
 					$selectDropdown.append( $optionText.html('PWM').val(board.MODES.PWM) );
 				}
@@ -102,7 +104,9 @@ $(document).ready(function() {
 					$('#pin'+index+' .pin-analog').show().siblings("div").hide();
 					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.ANALOG});
 					//socket.emit('analogReadReq',{pinNum:index, analogPinNum:pin.analogChannel}); //pin.analogChannel
-					
+				} else if (selectedMode == 'PWM'){
+					$('#pin'+index+' .pin-pwm').show().siblings("div").hide();
+					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.PWM});
 				} else {
 					$('#pin'+index+' .pin-servo').show().siblings("div").hide();
 					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.SERVO});
@@ -123,12 +127,20 @@ $(document).ready(function() {
 				}
 			});
 
+			$('#pin'+index+' .pin-pwm input[name=pwm]').change(function(event){
+				debug = this;
+				var pinNum = Number( $(debug).parent().parent().attr('value') );
+				var value = $(this).val();
+				console.log('pwm pin' + pinNum + ', value: ' + value);
+				socket.emit('analogWriteReq',{pin:pinNum, value:value});
+			});
+
 			$('#pin'+index+' .pin-servo input[name=servo]').change(function(event){
 				debug = this;
 				var pinNum = Number( $(debug).parent().parent().attr('value') );
 				var degree = $(this).val();
 				console.log('servo pin' + pinNum + ', degree: ' + degree);
-				socket.emit('servoWriteReq',{pin:pinNum, degree:degree});
+				socket.emit('analogWriteReq',{pin:pinNum, value:degree});
 			});
 
 
