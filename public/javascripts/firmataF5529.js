@@ -3,13 +3,9 @@ $(document).ready(function() {
 
 	var socket = io();
 
-	$('#populatePinsButton').click(function(e){
-		console.log('Populate Pins');
-		socket.emit('populatePinsRequest');
-	});
-
-	// socket.on('boardObjectResponse',function(boardObject){
-	// 	board = boardObject; // bring board object to client side
+	// $('#populatePinsButton').click(function(e){
+	// 	console.log('Populate Pins');
+	// 	socket.emit('populatePinsRequest');
 	// });
 
 	socket.on('analogReadRes', function(data){
@@ -148,22 +144,14 @@ $(document).ready(function() {
 		});
 	};
 
-	
-
-	// var initTargetPinMode = function(board){
-	// 	var analogPinNums = board.analogPins;
-	// 	$.each(analogPinNums, function(index,analogPinNum){
-	// 		board.pins[analogPinNum]
-	// 	});
-	// };
-
 	socket.on('populatePinsRespond',function(board){
+		console.log('populating pins');
+		//$('#initButton').hide();  //once connected, hide the connect button
+
 		$pinDiv = $('#pinDiv');
-		$pinDiv.html(''); // empty existing pinDiv
-		myboard = board;
-		initPinDiv(board);			//initialize #pinDiv structure on client
-		//initTargetPinMode(board);	//initialize pin mode on target
-		
+		$pinDiv.html(''); 			// empty existing pinDiv
+		myboard = board;			// debug purpose
+		initPinDiv(board);			//initialize #pinDiv structure on client		
 	});
 
 	$('#initButton').click(function(e){

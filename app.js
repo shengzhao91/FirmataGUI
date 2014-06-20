@@ -54,7 +54,10 @@ app.use(function(err, req, res, next) {
     });
 });
 
-var server = app.listen(3000);
+var server = app.listen(3000, function(){
+    console.log('   app listening on http://localhost:3000');
+});
+//var server2 = app.listen(3001);
 
 var temperatureReading = 0;
 //var firmata = require('./lib/firmata');
@@ -77,22 +80,25 @@ serialPort.list(function (err, ports) {
 });
 
 io.on('connection',function(socket){
-    console.log('a user connected');
+    console.log('a user0 connected');
     socket.emit('listPort', availablePorts);
     socket.on('connectPort',function(selectedPort){
+        launchpad.reinitialize(socket,selectedPort); //add reinitialize capability. MUST be called first
         launchpad.initialize(socket, selectedPort);
+
 
         //launchpad.analogRead(socket);
     });
     //launchpad.readTemperature(socket);
     launchpad.toggleLED(socket);
-    launchpad.populatePins(socket);
+    //launchpad.populatePins(socket);
     launchpad.togglePin(socket);
     //launchpad.digitalRead(socket);
     
     launchpad.analogWrite(socket);
     launchpad.pinMode(socket);
 });
+
 
 /*var launchpad = {
     initialize: function(){
