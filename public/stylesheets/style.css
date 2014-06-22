@@ -1,7 +1,8 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+#pinDiv div {
+	display: -webkit-box; 
 }
-a {
-  color: #00b7ff;
+
+.pin-pwm, .pin-servo {
+	/*padding: 5px;*/
+	display: inline;
 }

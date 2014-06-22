@@ -22,7 +22,7 @@ $(document).ready(function() {
 	var initPinDiv = function(board){
 		$.each(board.pins, function(index, pin){
 			// create div structure for each pin
-			$pinContainer = $('<div></div>').html('pin'+index).attr({'id':'pin'+index,'value':index,'style':'display: -webkit-box'});
+			$pinContainer = $('<div></div>').html('<label class="control-label">pin'+index+'</label>').attr({'id':'pin'+index,'value':index});
 			$pinContainer.append($('<select name="select' +index+'"></select>'));
 			$pinContainer.append($('<div class="pin-analog"></div>').hide());
 			$pinContainer.append($('<div class="pin-input"></div>').hide());
@@ -48,7 +48,7 @@ $(document).ready(function() {
 					$selectDropdown.append( $optionText.html('Input').val(board.MODES.INPUT) );
 				}
 				if (modeValue==board.MODES.OUTPUT){
-					$('#pin'+index+' .pin-output').html('<button>LOW</button>');
+					$('#pin'+index+' .pin-output').html('<button class="btn btn-default btn-xs">LOW</button>');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
 						$('#pin'+index+' .pin-output').show();

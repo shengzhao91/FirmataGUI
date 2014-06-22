@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html>
-<body>
+<head>
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="javascripts/firmataF5529.js"></script>
+	<link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="stylesheets/style.css">
+</head>
+<body>
 
-	<h1>Firmata MSP430F5529</h1>
+	<div class="container well">
+		<div class="well">
+			<h1>Node JS Firmata Test</h1>
+			<div class="row">
+				<div class="col-xs-4">
+					<select id="portListSelect" class="form-control"></select>
+				</div>
+				<div class="col-xs-8">
 
-	<select id="portListSelect"></select>
-	<button id="initButton">Connect</button>
+					<button id="initButton" class="btn btn-primary">Connect</button>
+				</div>
+			</div>
+			<hr/>
+			<div id="pinDiv"></div>
+		</div>
 
+		
+
+	<!--
 	<div>
 		<div>Temperature:</div>
 		<div class="TemperatureReading"></div>
@@ -17,19 +35,10 @@
 
 	<button id="ledButton">Toggle LED</button>
 
-	<button id="populatePinsButton">Populate Pins</button>
-	<div id="pinDiv"></div>
 
+	<button id="populatePinsButton">Populate Pins</button>
+	-->
 	
-	<!--<script>
-		$('#myButton').click(function(e)
-		{
-			$.post("/helloworld", function( data ) {
-				console.log(data);
-				$( ".result, h1" ).html( data.temperature );
-			});
-		});
-	</script>-->
-	
+</div>
 </body>
 </html>
