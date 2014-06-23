@@ -1,7 +1,8 @@
 NodeJS Firmata GUI for Launchpad
 ==========
 
-# Description
+**Description**
+
 This is a Node JS application that replicates ["firmata_test.exe"](http://firmata.org/) It allows users control the LaunchPad through a Graphical User Interface (GUI). This enables testing the launchpad's functionality and rapid-prototyping your own application.
 
 * Supported LaunchPads
@@ -11,7 +12,7 @@ This is a Node JS application that replicates ["firmata_test.exe"](http://firmat
 	* EK-LM4F120XL (Tiva C)
 	* EK-LM4F1294XL (Connected)
 
-# How to setup Firmata on LaunchPad (Windows)
+**How to setup Firmata on LaunchPad (Windows)**
 
 * Target Device Side (LaunchPad)
 	* Install [Energia](http://energia.nu/download/)
