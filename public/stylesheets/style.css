@@ -2,7 +2,12 @@
 	display: -webkit-box; 
 }
 
-.pin-pwm, .pin-servo {
-	/*padding: 5px;*/
+.pin-analog, .pin-input, .pin-pwm, .pin-servo {
+	padding: 7px;
 	display: inline;
+}
+
+/* prevent dropdown from being too wide*/
+#pinDiv .form-control {
+	width: inherit;
 }

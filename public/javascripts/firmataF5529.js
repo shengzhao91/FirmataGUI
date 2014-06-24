@@ -22,13 +22,20 @@ $(document).ready(function() {
 	var initPinDiv = function(board){
 		$.each(board.pins, function(index, pin){
 			// create div structure for each pin
-			$pinContainer = $('<div></div>').html('<label class="control-label">pin'+index+'</label>').attr({'id':'pin'+index,'value':index});
-			$pinContainer.append($('<select name="select' +index+'"></select>'));
-			$pinContainer.append($('<div class="pin-analog"></div>').hide());
-			$pinContainer.append($('<div class="pin-input"></div>').hide());
-			$pinContainer.append($('<div class="pin-output"></div>').hide());
-			$pinContainer.append($('<div class="pin-pwm"></div>').hide());
-			$pinContainer.append($('<div class="pin-servo"></div>').hide());
+			$pinContainer = $('<div></div>').attr({'id':'pin'+index,'value':index,'class':'form-inline'});
+			var pinNumLabel = index>9?index:"0"+index;
+			$pinContainer.append($('<label class="control-label">pin'+pinNumLabel+'</label>'));
+			
+			// check whether the pin can be controlled
+			if (pin.supportedModes.length) {
+				$pinContainer.append($('<select name="select' +index+'" class="form-control"></select>'));
+				$pinContainer.append($('<div class="pin-analog"></div>').hide());
+				$pinContainer.append($('<div class="pin-input"></div>').hide());
+				$pinContainer.append($('<div class="pin-output"></div>').hide());
+				$pinContainer.append($('<div class="pin-pwm"></div>').hide());
+				$pinContainer.append($('<div class="pin-servo"></div>').hide());	
+			}
+			
 			$pinDiv.append($pinContainer);
 
 
@@ -48,7 +55,7 @@ $(document).ready(function() {
 					$selectDropdown.append( $optionText.html('Input').val(board.MODES.INPUT) );
 				}
 				if (modeValue==board.MODES.OUTPUT){
-					$('#pin'+index+' .pin-output').html('<button class="btn btn-default btn-xs">LOW</button>');
+					$('#pin'+index+' .pin-output').html('<button class="btn btn-default">LOW</button>');
 					if (modeValue == pin.mode) {
 						$optionText.attr('selected',true);
 						$('#pin'+index+' .pin-output').show();
@@ -123,7 +130,8 @@ $(document).ready(function() {
 				}
 			});
 
-			$('#pin'+index+' .pin-pwm input[name=pwm]').change(function(event){
+			// pwm slider
+			$('#pin'+index+' .pin-pwm input[name=pwm]').on('input',function(event){
 				debug = this;
 				var pinNum = Number( $(debug).parent().parent().attr('value') );
 				var value = $(this).val();
@@ -131,7 +139,8 @@ $(document).ready(function() {
 				socket.emit('analogWriteReq',{pin:pinNum, value:value});
 			});
 
-			$('#pin'+index+' .pin-servo input[name=servo]').change(function(event){
+			// servo slider
+			$('#pin'+index+' .pin-servo input[name=servo]').on('input',function(event){
 				debug = this;
 				var pinNum = Number( $(debug).parent().parent().attr('value') );
 				var degree = $(this).val();
