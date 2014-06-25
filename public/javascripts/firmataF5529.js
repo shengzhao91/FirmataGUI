@@ -160,7 +160,9 @@ $(document).ready(function() {
 		$pinDiv = $('#pinDiv');
 		$pinDiv.html(''); 			// empty existing pinDiv
 		myboard = board;			// debug purpose
-		initPinDiv(board);			//initialize #pinDiv structure on client		
+		initPinDiv(board);			//initialize #pinDiv structure on client
+		$('#pinDiv').show();
+		$('#i2cDiv').show();
 	});
 
 	$('#initButton').click(function(e){
@@ -185,6 +187,58 @@ $(document).ready(function() {
 	$("#ledButton").click(function(e){
 		console.log('LED toggled');
 		socket.emit('toggleLED',43);
+	});
+
+	$('#i2cInitBtn').click(function(){
+		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
+		if (slaveAddrText) {
+			var slaveAddress = [slaveAddrText].map(Number);
+			if (slaveAddress){
+				console.log('I2C Initialize: ' + slaveAddress);
+				socket.emit('I2CInitRequest', {addr:slaveAddress});
+			}
+		}
+
+	})
+
+	$('#i2cWriteBtn').click(function(){
+		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
+		if (slaveAddrText) {
+			var slaveAddress = [slaveAddrText].map(Number);
+		}
+
+		var text = $('#i2cSendTextbox').val();
+		if (text){
+			var textArr = text.split(",");		// raw text to text array
+			var dataArr = textArr.map(Number);	//text array to number array
+		}
+
+		if (slaveAddress && dataArr){
+			console.log("I2C Send " + slaveAddress + ": " + dataArr);
+			socket.emit('I2CWriteRequest', {addr: slaveAddress, value:dataArr});
+		} else {
+			console.log("I2C Invalid Data " + slaveAddress + ": " + dataArr);
+		}
+	});
+
+	$('#i2cReadBtn').click(function(){
+		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
+		if (slaveAddrText) {
+			var slaveAddress = [slaveAddrText].map(Number);
+		}
+		var readCount = $('#i2cByteCntTextbox').val();
+		if (slaveAddress && readCount){
+			console.log('I2C Read'+ slaveAddress + ": " + readCount + " bytes");
+			socket.emit('I2CReadRequest', {addr: slaveAddress, bytecnt:readCount});
+		} else {
+			console.log("I2C Invalid Data " + slaveAddress + ": " + readCount);
+		}
+	});
+
+	socket.on('I2CReadRequestRes',function(msg){
+		console.log(msg);
+		$('#i2cResultTextbox').val(msg);
+		i2cResult = msg;
 	});
 
 });
