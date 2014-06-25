@@ -11,3 +11,7 @@
 #pinDiv .form-control {
 	width: inherit;
 }
+
+#pinDiv label {
+	margin-right: 5px;
+}

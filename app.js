@@ -89,6 +89,7 @@ io.on('connection',function(socket){
 
         //launchpad.analogRead(socket);
     });
+    launchpad.analogFreqUpdate(socket);
     launchpad.sendI2CConfig(socket);
     launchpad.sendI2CWriteRequest(socket);
     launchpad.sendI2CReadRequest(socket);

@@ -24,28 +24,40 @@
 			<hr/>
 			<div class="row">
 				<div hidden id="pinDiv" class="col-xs-6"></div>
-				<div hidden id="i2cDiv" class="col-xs-6 well">
-					<label class="control-label">I2C Control</label>
-					<div class="form-inline">
-						<div class="form-group">
-							<input type="text" class="form-control" id="i2cSlaveAddrTextbox" placeholder="Slave Addr e.g. 0x48">	
-							<button class="btn btn-primary" id="i2cInitBtn">Initialize</button>
-						</div>
-						
-						<div class="form-group">
-						    <input type="text" class="form-control" id="i2cSendTextbox" placeholder="0x00, 0xAB, ...">
-						    <button class="btn btn-primary" id="i2cWriteBtn">Write</button>
-						</div>
-						<div class="form-group">
-						    <input type="text" class="form-control" id="i2cByteCntTextbox" placeholder="# of bytes">
-						    
-						    <button class="btn btn-primary" id="i2cReadBtn">Read</button>
-						</div>
-						<input type="text" class="form-control" id="i2cResultTextbox" placeholder="Result">
-						<p>The returned I2C result can be accessed through variable "i2cResult" in the console.</p>
+				<div hidden id="rightPanel" class="col-xs-6 well">
+					<div id="analogUpdateFreqDiv" class="well">
+						<label class="control-label">Analog Update Frequency</label>
+						<select id="analogUpdateFreqSelect" class="form-control">
+							<option>Slow</option>
+							<option selected>Standard</option>
+							<option>Fast</option>
+						</select>
+					</div>
+					<div id="i2cDiv" class="well">
+						<label class="control-label">I2C Control</label>
+						<div class="form-inline">
+							<div class="form-group">
+								<input type="text" class="form-control" id="i2cSlaveAddrTextbox" placeholder="Slave Addr e.g. 0x48">	
+								<button class="btn btn-primary" id="i2cInitBtn">Initialize</button>
+							</div>
 							
+							<div class="form-group">
+							    <input type="text" class="form-control" id="i2cSendTextbox" placeholder="0x00, 0xAB, ...">
+							    <button class="btn btn-primary" id="i2cWriteBtn">Write</button>
+							</div>
+							<div class="form-group">
+							    <input type="text" class="form-control" id="i2cByteCntTextbox" placeholder="# of bytes">
+							    
+							    <button class="btn btn-primary" id="i2cReadBtn">Read</button>
+							</div>
+						</div>
+						<div class="form-group">
+								<input type="text" class="form-control" id="i2cResultTextbox" placeholder="Result">
+							</div>
+							<p>The returned I2C result can be accessed through variable "i2cResult" in the console.</p>
 					</div>
 				</div>
+					
 			</div>
 		</div>
 	</div>
@@ -57,9 +69,6 @@
 		<div>Temperature:</div>
 		<div class="TemperatureReading"></div>
 	</div>	
-
-	<button id="ledButton">Toggle LED</button>
-
 
 	<button id="populatePinsButton">Populate Pins</button>
 	-->

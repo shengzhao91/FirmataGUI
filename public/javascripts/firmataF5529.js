@@ -9,7 +9,7 @@ $(document).ready(function() {
 	// });
 
 	socket.on('analogReadRes', function(data){
-		console.log('analogReadRes: pin' + data.pinNum + ' - ' + data.value);
+		//console.log('analogReadRes: pin' + data.pinNum + ' - ' + data.value);
 		$('#pin'+data.pinNum+' .pin-analog').html(data.value);
 	});
 
@@ -162,7 +162,7 @@ $(document).ready(function() {
 		myboard = board;			// debug purpose
 		initPinDiv(board);			//initialize #pinDiv structure on client
 		$('#pinDiv').show();
-		$('#i2cDiv').show();
+		$('#rightPanel').show();
 	});
 
 	$('#initButton').click(function(e){
@@ -184,9 +184,10 @@ $(document).ready(function() {
 		});
 	});
 
-	$("#ledButton").click(function(e){
-		console.log('LED toggled');
-		socket.emit('toggleLED',43);
+	$('#analogUpdateFreqSelect').change(function(){
+		var updateMode = $(this).find('option:selected').html();
+		console.log('analog update frequency mode: ' + updateMode);
+		socket.emit('analogUpdateFreqReq', updateMode)
 	});
 
 	$('#i2cInitBtn').click(function(){
