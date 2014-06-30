@@ -3,7 +3,7 @@ NodeJS Firmata GUI for Launchpad
 
 **Description**
 
-This is a Node JS application that replicates ["firmata_test.exe"](http://firmata.org/) It allows users control the LaunchPad through a Graphical User Interface (GUI). This enables testing the launchpad's functionality and rapid-prototyping your own application.
+This is a Node JS application that replicates ["firmata_test.exe"](http://firmata.org/) It allows users control the LaunchPad through a Graphical User Interface (GUI). This enables testing the launchpad's functionality and rapid-prototyping your own application. Here is a [demonstration video](http://youtu.be/t-D9XZS2DeQ).
 
 * Supported LaunchPads
 	* MSP-EXP430F5529LP (LaunchPad) -- Recommend to use this board first
