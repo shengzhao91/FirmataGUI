@@ -1,3 +1,7 @@
+body {
+	background: rgb(70,100,100);
+}
+
 #pinDiv div {
 	display: -webkit-box; 
 }

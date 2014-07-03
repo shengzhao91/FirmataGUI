@@ -26,9 +26,9 @@ This is a Node JS application that replicates ["firmata_test.exe"](http://firmat
 * Node JS Side (PC)
 	* Install Node JS
 	* Download [Firmata GUI](https://github.com/shengzhao91/FirmataGUI)
-	* Go to <your_dir>/FirmataGUI.
-	* Run "npm install" and "npm install serialport"
-	* Type "npm start"
+	* Open Command Prompt. Go to "your_dir"/FirmataGUI.
+	* Run "npm install" to install node modules
+	* Run "npm start" to start the node server
 	* Go to your browser at "http://localhost:3000/"
 	* Select your UART port LaunchPad is on and click "Connect"
 	* You should see all the ports populated in your browser and you can control the pins!
