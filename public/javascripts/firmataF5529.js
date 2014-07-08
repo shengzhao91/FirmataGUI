@@ -1,25 +1,98 @@
 $(document).ready(function() { 
 	console.log('Firmata MSP430F5529');
 
-	var socket = io();
+	var launchpad = new LaunchPad();
 
-	// $('#populatePinsButton').click(function(e){
-	// 	console.log('Populate Pins');
-	// 	socket.emit('populatePinsRequest');
-	// });
-
-	socket.on('analogReadRes', function(data){
-		//console.log('analogReadRes: pin' + data.pinNum + ' - ' + data.value);
-		$('#pin'+data.pinNum+' .pin-analog').html(data.value);
+	launchpad.getPortList(function(msg){
+		$.each(msg, function(index, serialInfo) {
+			$('#portListSelect').append(
+				$('<option></option>').val(index).html(serialInfo.comName)
+			);
+		});
 	});
 
-	socket.on('digitalReadRes',function(data){
-		console.log('digitalReadRes: pin' + data.pinNum + ' - ' + data.value);
-		$('#pin'+data.pinNum+' .pin-input').html(data.value?'HIGH':'LOW');
+	$('#connectBtn').click(function(e){
+		var selectedPort = $('#portListSelect :selected').text();
+		console.log('Connect Port - ' + selectedPort);
+		launchpad.connect(selectedPort, function(board){
+			myboard = board;			// debug purpose
+			$('#pinDiv').html(''); 			// empty existing pinDiv
+			initPinDiv(board);			//initialize #pinDiv structure on client
+
+			//$('#connectBtn').hide();  //once connected, hide the connect button
+			$('#pinDiv').show();
+			$('#rightPanel').show();
+		});
+	});
+
+	launchpad.analogRead(function(data){
+		//console.log('analogReadRes: pin' + data.pin + ' - ' + data.value);
+		$('#pin'+data.pin+' .pin-analog').html(data.value);
+	});
+
+	launchpad.digitalRead(function(data){
+		//console.log('digitalReadRes: pin' + data.pin + ' - ' + data.value);
+		$('#pin'+data.pin+' .pin-input').html(data.value?'HIGH':'LOW');
+	});
+
+	$('#analogUpdateFreqSelect').change(function(){
+		var updateMode = $(this).find('option:selected').html();
+		console.log('analog update frequency mode: ' + updateMode);
+		launchpad.setAnalogUpdateFreq(updateMode);
+	});
+
+	$('#i2cInitBtn').click(function(){
+		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
+		if (slaveAddrText) {
+			var slaveAddress = [slaveAddrText].map(Number);
+			if (slaveAddress){
+				console.log('I2C Initialize: ' + slaveAddress);
+				launchpad.i2cInit(slaveAddress);
+			}
+		}
+	});
+
+	$('#i2cReadBtn').click(function(){
+		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
+		if (slaveAddrText) {
+			var slaveAddress = [slaveAddrText].map(Number);
+		}
+		var readCount = $('#i2cByteCntTextbox').val();
+		if (slaveAddress && readCount){
+			console.log('I2C Read'+ slaveAddress + ": " + readCount + " bytes");
+			launchpad.i2cRead(slaveAddress,readCount, function(msg){
+				console.log(msg);
+				$('#i2cResultTextbox').val(msg);
+				i2cResult = msg;
+			});
+		} else {
+			console.log("I2C Invalid Data " + slaveAddress + ": " + readCount);
+		}
+	});
+
+	$('#i2cWriteBtn').click(function(){
+		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
+		if (slaveAddrText) {
+			var slaveAddress = [slaveAddrText].map(Number);
+		}
+
+		var text = $('#i2cSendTextbox').val();
+		if (text){
+			var textArr = text.split(",");		// raw text to text array
+			var dataArr = textArr.map(Number);	//text array to number array
+		}
+
+		if (slaveAddress && dataArr){
+			console.log("I2C Send " + slaveAddress + ": " + dataArr);
+			launchpad.i2cWrite(slaveAddress,dataArr);
+		} else {
+			console.log("I2C Invalid Data " + slaveAddress + ": " + dataArr);
+		}
 	});
 
 	// Initialize #pinDiv on client
 	var initPinDiv = function(board){
+		$pinDiv = $('#pinDiv');
 		$.each(board.pins, function(index, pin){
 			// create div structure for each pin
 			$pinContainer = $('<div></div>').attr({'id':'pin'+index,'value':index,'class':'form-inline'});
@@ -37,7 +110,6 @@ $(document).ready(function() {
 			}
 			
 			$pinDiv.append($pinContainer);
-
 
 			// dropdown selector
 			$selectDropdown = $('select[name="select' +index + '"]');
@@ -85,163 +157,62 @@ $(document).ready(function() {
 						$('#pin'+index+' .pin-servo').show();
 					}
 					$selectDropdown.append( $optionText.html('Servo').val(board.MODES.SERVO) );
-				}
-					
+				}	
 			});
 
+			// after new mode is selected from the dropdown
 			$selectDropdown.change(function() {
 				var selectedMode = $(this).find('option:selected').html();
 				var selectedName = $(this).attr('name');
 				console.log(selectedName + ': ' + selectedMode + ', index:'+index);
 				if (selectedMode == 'Input'){
-					// TO-DO: pin.value only updates after clicking populate pins.
 					$('#pin'+index+' .pin-input').show().siblings("div").hide(); 
-					console.log('DigitalRead pin'+index);
-					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.INPUT}); 
-					//socket.emit('digitalReadReq',index);
+					launchpad.setPinMode(index,board.MODES.INPUT);
 				} else if (selectedMode == 'Output'){
 					$('#pin'+index+' .pin-output').show().siblings("div").hide();
-					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.OUTPUT}); 
-
+					launchpad.setPinMode(index,board.MODES.OUTPUT);
 				} else if (selectedMode == 'Analog'){
 					$('#pin'+index+' .pin-analog').show().siblings("div").hide();
-					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.ANALOG});
-					//socket.emit('analogReadReq',{pinNum:index, analogPinNum:pin.analogChannel}); //pin.analogChannel
+					launchpad.setPinMode(index,board.MODES.ANALOG);
 				} else if (selectedMode == 'PWM'){
 					$('#pin'+index+' .pin-pwm').show().siblings("div").hide();
-					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.PWM});
+					launchpad.setPinMode(index,board.MODES.PWM);
 				} else {
 					$('#pin'+index+' .pin-servo').show().siblings("div").hide();
-					socket.emit('pinModeReq', {pinNum: index,mode: board.MODES.SERVO});
+					launchpad.setPinMode(index,board.MODES.SERVO);
 				}
 			});
 
 			// OUTPUT button logic
 			$('#pin'+index).on('click',  'button', function(event){
-				console.log('clicked');
 				if($(this).html() == 'HIGH') {
 					$(this).html('LOW');
-					socket.emit('togglePin',
-						{ pinNum:$(this).parent().parent().attr('value'), value: 0} );
+					launchpad.digitalWrite($(this).parent().parent().attr('value'), 0);
 				} else {
 					$(this).html('HIGH');
-					socket.emit('togglePin',
-						{ pinNum:$(this).parent().parent().attr('value'), value: 1} );
+					launchpad.digitalWrite($(this).parent().parent().attr('value'), 1);
 				}
 			});
 
 			// pwm slider
 			$('#pin'+index+' .pin-pwm input[name=pwm]').on('input',function(event){
 				debug = this;
-				var pinNum = Number( $(debug).parent().parent().attr('value') );
+				var pinNum = Number( $(debug).parent().parent().attr('value') ); //changed slider's pin #
 				var value = $(this).val();
 				console.log('pwm pin' + pinNum + ', value: ' + value);
-				socket.emit('analogWriteReq',{pin:pinNum, value:value});
+				launchpad.analogWrite(pinNum,value);
 			});
 
 			// servo slider
 			$('#pin'+index+' .pin-servo input[name=servo]').on('input',function(event){
 				debug = this;
-				var pinNum = Number( $(debug).parent().parent().attr('value') );
+				var pinNum = Number( $(debug).parent().parent().attr('value') ); //changed slider's pin #
 				var degree = $(this).val();
 				console.log('servo pin' + pinNum + ', degree: ' + degree);
-				socket.emit('analogWriteReq',{pin:pinNum, value:degree});
+				launchpad.analogWrite(pinNum,degree);
 			});
-
-
-
 		});
 	};
-
-	socket.on('populatePinsRespond',function(board){
-		console.log('populating pins');
-		//$('#initButton').hide();  //once connected, hide the connect button
-
-		$pinDiv = $('#pinDiv');
-		$pinDiv.html(''); 			// empty existing pinDiv
-		myboard = board;			// debug purpose
-		initPinDiv(board);			//initialize #pinDiv structure on client
-		$('#pinDiv').show();
-		$('#rightPanel').show();
-	});
-
-	$('#initButton').click(function(e){
-		
-		var selectedPort = $('#portListSelect :selected').text();
-		console.log('Connect Port - ' + selectedPort);
-		socket.emit('connectPort',selectedPort);
-	});
-
-	socket.on('tempRead',function(msg){
-		$(".TemperatureReading").html(msg);
-	});
-
-	socket.on('listPort',function(msg){
-		$.each(msg, function(index, serialInfo) {
-			$('#portListSelect').append(
-				$('<option></option>').val(index).html(serialInfo.comName)
-			);
-		});
-	});
-
-	$('#analogUpdateFreqSelect').change(function(){
-		var updateMode = $(this).find('option:selected').html();
-		console.log('analog update frequency mode: ' + updateMode);
-		socket.emit('analogUpdateFreqReq', updateMode)
-	});
-
-	$('#i2cInitBtn').click(function(){
-		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
-		if (slaveAddrText) {
-			var slaveAddress = [slaveAddrText].map(Number);
-			if (slaveAddress){
-				console.log('I2C Initialize: ' + slaveAddress);
-				socket.emit('I2CInitRequest', {addr:slaveAddress});
-			}
-		}
-
-	})
-
-	$('#i2cWriteBtn').click(function(){
-		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
-		if (slaveAddrText) {
-			var slaveAddress = [slaveAddrText].map(Number);
-		}
-
-		var text = $('#i2cSendTextbox').val();
-		if (text){
-			var textArr = text.split(",");		// raw text to text array
-			var dataArr = textArr.map(Number);	//text array to number array
-		}
-
-		if (slaveAddress && dataArr){
-			console.log("I2C Send " + slaveAddress + ": " + dataArr);
-			socket.emit('I2CWriteRequest', {addr: slaveAddress, value:dataArr});
-		} else {
-			console.log("I2C Invalid Data " + slaveAddress + ": " + dataArr);
-		}
-	});
-
-	$('#i2cReadBtn').click(function(){
-		var slaveAddrText = $('#i2cSlaveAddrTextbox').val();
-		if (slaveAddrText) {
-			var slaveAddress = [slaveAddrText].map(Number);
-		}
-		var readCount = $('#i2cByteCntTextbox').val();
-		if (slaveAddress && readCount){
-			console.log('I2C Read'+ slaveAddress + ": " + readCount + " bytes");
-			socket.emit('I2CReadRequest', {addr: slaveAddress, bytecnt:readCount});
-		} else {
-			console.log("I2C Invalid Data " + slaveAddress + ": " + readCount);
-		}
-	});
-
-	socket.on('I2CReadRequestRes',function(msg){
-		console.log(msg);
-		$('#i2cResultTextbox').val(msg);
-		i2cResult = msg;
-	});
-
 });
 
 // Pin structure

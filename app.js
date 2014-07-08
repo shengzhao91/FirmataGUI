@@ -81,68 +81,25 @@ serialPort.list(function (err, ports) {
 
 io.on('connection',function(socket){
     console.log('a user0 connected');
-    socket.emit('listPort', availablePorts);
+    socket.on('listPortReq',function(){
+        socket.emit('listPortRes', availablePorts);    
+    })
     socket.on('connectPort',function(selectedPort){
-        launchpad.reinitialize(socket,selectedPort); //add reinitialize capability. MUST be called first
         launchpad.initialize(socket, selectedPort);
 
+        launchpad.analogFreqUpdate(socket);
+        launchpad.sendI2CConfig(socket);
+        launchpad.sendI2CWriteRequest(socket);
+        launchpad.sendI2CReadRequest(socket);
 
-        //launchpad.analogRead(socket);
+        //launchpad.readTemperature(socket);
+        //launchpad.populatePins(socket);
+        
+        launchpad.digitalWrite(socket);
+        launchpad.analogWrite(socket);
+        launchpad.pinMode(socket);
     });
-    launchpad.analogFreqUpdate(socket);
-    launchpad.sendI2CConfig(socket);
-    launchpad.sendI2CWriteRequest(socket);
-    launchpad.sendI2CReadRequest(socket);
-
-    //launchpad.readTemperature(socket);
-    //launchpad.populatePins(socket);
-    launchpad.togglePin(socket);
-    //launchpad.digitalRead(socket);
     
-    launchpad.analogWrite(socket);
-    launchpad.pinMode(socket);
 });
-
-
-/*var launchpad = {
-    initialize: function(){
-        console.log('initializing');
-        var board = new firmata.Board('COM9', function(err) {
-            console.log(new Date());
-            if (err) {
-                console.log(err);
-                return;
-            }
-            console.log('connected');
-
-            console.log('Firmware: ' + board.firmware.name + '-' + board.firmware.version.major + '.' + board.firmware.version.minor);
-
-        io.on('connection', function(socket){
-            console.log('a user connected');
-            var ledOn = 0;
-            board.pinMode(43, board.MODES.OUTPUT);
-
-            socket.on('toggleLED', function(){
-                console.log('toggleLED:'+ledOn);
-
-                if (ledOn) {
-                    console.log('+');
-                    board.digitalWrite(43, board.HIGH);
-                }
-                else {
-                    console.log('-');
-                    board.digitalWrite(43, board.LOW);
-                }
-
-                ledOn = !ledOn;
-                    
-            });
-        });
-
-        });
-    },
-
-};*/
-
 
 module.exports = app;
