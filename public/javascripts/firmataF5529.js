@@ -1,7 +1,8 @@
 $(document).ready(function() { 
 	console.log('Firmata MSP430F5529');
 
-	var launchpad = new LaunchPad();
+	var socket = io();
+	var launchpad = new LaunchPad(socket);
 
 	launchpad.getPortList(function(msg){
 		$.each(msg, function(index, serialInfo) {
@@ -11,7 +12,12 @@ $(document).ready(function() {
 		});
 	});
 
-	$('#connectBtn').click(function(e){
+	$connectBtn = $('#connectBtn');
+	$disconnectBtn = $('#disconnectBtn');
+
+	$connectBtn.click(function(){
+		$connectBtn.attr("disabled", "disabled");     // disable connect button after clicked
+
 		var selectedPort = $('#portListSelect :selected').text();
 		console.log('Connect Port - ' + selectedPort);
 		launchpad.connect(selectedPort, function(board){
@@ -19,9 +25,21 @@ $(document).ready(function() {
 			$('#pinDiv').html(''); 			// empty existing pinDiv
 			initPinDiv(board);			//initialize #pinDiv structure on client
 
-			//$('#connectBtn').hide();  //once connected, hide the connect button
+			$connectBtn.hide().removeAttr("disabled"); //once connected, hide the connect button
+			$disconnectBtn.show();				   //show disconnect button
 			$('#pinDiv').show();
 			$('#rightPanel').show();
+		});
+	});
+
+	$disconnectBtn.click(function(){
+		$disconnectBtn.attr("disabled", "disabled");     // disable disconnect button after clicked
+		launchpad.disconnect(function(){
+			$disconnectBtn.hide().removeAttr("disabled"); //once disconnected, hide the disconnect button
+			$connectBtn.show();				   //show connect button
+
+			$('#pinDiv').hide();
+			$('#rightPanel').hide();
 		});
 	});
 

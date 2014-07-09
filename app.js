@@ -80,26 +80,29 @@ serialPort.list(function (err, ports) {
 });
 
 io.on('connection',function(socket){
-    console.log('a user0 connected');
+    console.log('user0 connected');
     socket.on('listPortReq',function(){
-        socket.emit('listPortRes', availablePorts);    
+        socket.emit('listPortRes', availablePorts);
     })
     socket.on('connectPort',function(selectedPort){
         launchpad.initialize(socket, selectedPort);
-
+        launchpad.digitalWrite(socket);
+        launchpad.analogWrite(socket);
+        launchpad.pinMode(socket);
         launchpad.analogFreqUpdate(socket);
         launchpad.sendI2CConfig(socket);
         launchpad.sendI2CWriteRequest(socket);
         launchpad.sendI2CReadRequest(socket);
-
-        //launchpad.readTemperature(socket);
-        //launchpad.populatePins(socket);
-        
-        launchpad.digitalWrite(socket);
-        launchpad.analogWrite(socket);
-        launchpad.pinMode(socket);
     });
-    
+
+    socket.on('disconnectPort',function(){
+        launchpad.closeSerialPort(socket);
+    });
+
+    socket.on('disconnect', function(){
+        console.log('user0 disconnected');
+        launchpad.closeSerialPort(socket);
+    });
 });
 
 module.exports = app;
