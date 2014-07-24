@@ -1,21 +1,60 @@
 body {
-	background: rgb(70,100,100);
+	/*background: rgb(70,100,100);*/
+	background: whitesmoke;
+	padding-top: 70px; //Boostrap Fixed Nav-bar
 }
 
-#pinDiv div {
+.popover-content > div {
 	display: -webkit-box; 
+	width: 150px;
 }
 
-.pin-analog, .pin-input, .pin-pwm, .pin-servo {
+.pin-analog, .pin-input {
 	padding: 7px;
 	display: inline;
 }
 
-/* prevent dropdown from being too wide*/
-#pinDiv .form-control {
-	width: inherit;
+.pin-pwm, .pin-servo {
+	padding: 2px;
 }
 
-#pinDiv label {
-	margin-right: 5px;
+.pin-placeholder {
+	width: 50px;
+}
+
+.navbar-brand {
+	color: red !important;
+}
+
+.pin-col > button, #extraPinDiv>button {
+	color: black;
+	font-size: x-large;
+	font-family: fantasy;
+	border-color: black;
+	height: 58px;
+	margin-top: 0px  !important;
+}
+
+#extraPinDiv {
+	text-align: center;
+	margin-top: 55px;
+}
+
+.pin-col {
+   padding: 0 !important;
+}
+
+/* digitalRead, digitalWrite */
+.btnInput.btnOutput {   
+	background:#2DCC30; /*green*/
+}
+
+.btnInput.btnOutput.btnAnalog, 
+.btnInput.btnOutput.btnPWM.btnAnalog, 
+.btnInput.btnOutput.btnServo.btnAnalog{   
+	background:#44DBFC; /*blue*/
+}
+
+.btnInput.btnOutput.btnPWM, .btnInput.btnOutput.btnServo{   
+	background:purple; /*purple*/
 }

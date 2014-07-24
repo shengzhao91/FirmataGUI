@@ -37,6 +37,8 @@ $(document).ready(function() {
 	}
 
 	LaunchPad.prototype.analogWrite = function(pin, value){
+		if(value>255){value = 255;}
+		if(value<0){value = 0;}
 		this.socket.emit('analogWrite',{pin:pin, value:value});
 	}
 

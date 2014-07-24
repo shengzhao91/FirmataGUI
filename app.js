@@ -59,28 +59,27 @@ var server = app.listen(3000, function(){
 });
 //var server2 = app.listen(3001);
 
-var temperatureReading = 0;
-//var firmata = require('./lib/firmata');
 var launchpad = require('./lib/launchpad');
-// Enabled socket.io. Disabled server creation in www/bin
 
+// Enabled socket.io. Disabled server creation in www/bin
 var io = require('socket.io').listen(server);
 
 var serialPort = require("serialport");
-//var five = require("johnny-five"), board = new five.Board();
 
 var availablePorts = {};
-serialPort.list(function (err, ports) {
-    availablePorts = ports;
-  // ports.forEach(function(port) {
-  //   console.log(port.comName);
-  //   console.log(port.pnpId);
-  //   console.log(port.manufacturer);
-  // });
-});
 
 io.on('connection',function(socket){
     console.log('user0 connected');
+
+    serialPort.list(function (err, ports) {
+        availablePorts = ports;
+        // ports.forEach(function(port) {
+        //   console.log(port.comName);
+        //   console.log(port.pnpId);
+        //   console.log(port.manufacturer);
+        // });
+    });
+    
     socket.on('listPortReq',function(){
         socket.emit('listPortRes', availablePorts);
     })
