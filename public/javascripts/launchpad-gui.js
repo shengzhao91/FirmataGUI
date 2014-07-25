@@ -24,8 +24,7 @@ $(document).ready(function() {
 			myboard = board;			// debug purpose
 			$('#boosterpackPinDiv').html(''); 			// empty existing pins
 			$('#extraPinDiv').html(''); 			// empty existing pins
-			launchpad = new LaunchPad(socket);
-			initPinDiv(launchpad,board);			//initialize pin layout
+			initPinDiv(board);			//initialize pin layout
 
 			$connectBtn.hide().removeAttr("disabled"); //once connected, hide the connect button
 			$disconnectBtn.show();				   //show disconnect button
@@ -37,12 +36,9 @@ $(document).ready(function() {
 		launchpad.disconnect(function(){
 			$disconnectBtn.hide().removeAttr("disabled"); //once disconnected, hide the disconnect button
 			$connectBtn.show();				   //show connect button
-			//launchpad = null;
 
-			$('.popover').remove();
 			$('#boosterpackPinDiv').html(''); 			// empty existing pins
 			$('#extraPinDiv').html(''); 			// empty existing pins
-			// window.location.reload();  // a workaround to fix reconnection causing repopulate dropdowns
 		});
 	});
 
@@ -111,7 +107,7 @@ $(document).ready(function() {
 		}
 	});
 
-	var initPinDiv = function(launchpad, board){
+	var initPinDiv = function(board){
 
 		var boosterpackPinDiv = $('#boosterpackPinDiv');
 		boosterpackPinDiv.append('<div id="pin1to10" class="col-sm-1 pin-col"></div>');
@@ -172,7 +168,7 @@ $(document).ready(function() {
 				content: pinContainer.prop('outerHTML'),
 				placement : pinButton.attr("popover-placement"),
 				trigger: 'manual',
-				container:'body'
+				container:'#boosterpackPinDiv'
 			});	
 
 			pinButton.click(function(){

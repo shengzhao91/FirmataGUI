@@ -59,7 +59,7 @@ var server = app.listen(3000, function(){
 });
 //var server2 = app.listen(3001);
 
-var launchpad = require('./lib/launchpad');
+var LaunchpadServer = require('./lib/launchpad');
 
 // Enabled socket.io. Disabled server creation in www/bin
 var io = require('socket.io').listen(server);
@@ -70,6 +70,7 @@ var availablePorts = {};
 
 io.on('connection',function(socket){
     console.log('user0 connected');
+    var launchpad = new LaunchpadServer();
 
     serialPort.list(function (err, ports) {
         availablePorts = ports;
