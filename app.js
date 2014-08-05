@@ -68,8 +68,12 @@ var serialPort = require("serialport");
 
 var availablePorts = {};
 
+// var userCounter = 0;
+
 io.on('connection',function(socket){
-    console.log('user0 connected');
+    console.log('client connected: '+ socket.id);
+    // userCounter++;
+
     var launchpad = new LaunchpadServer();
 
     serialPort.list(function (err, ports) {
@@ -100,8 +104,12 @@ io.on('connection',function(socket){
     });
 
     socket.on('disconnect', function(){
-        console.log('user0 disconnected');
+        console.log('client disconnected: '+ socket.id);
         launchpad.closeSerialPort(socket);
+        // userCounter--;
+        // if (userCounter == 0){
+        //     launchpad.closeSerialPort(socket);
+        // }
     });
 });
 

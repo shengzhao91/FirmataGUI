@@ -5,8 +5,10 @@
 	<script src="javascripts/jquery-1.11.1.min.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
+	<script src="javascripts/Chart.js"></script>
 	<script src="javascripts/firmata-lib.js"></script>
 	<script src="javascripts/launchpad-gui.js"></script>
+
 	<link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="stylesheets/style.css">
 </head>
@@ -27,6 +29,7 @@
 					<li class="active"><a href="#">Home</a></li>
 					<li><a href="#Reference">Reference</a></li>
 					<li><a href="#Graph">Graph</a></li>
+					<!-- <li><a href="" data-toggle="modal" data-target="#GraphModal">Graph</a></li> -->
 				</ul>
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-right">
@@ -41,17 +44,45 @@
 		</div>
 
 		<div class="row">
-			<div class="col-sm-3"></div>
+			<div class="col-sm-3">
+
+			</div>
 			<div class="col-sm-6">
 
-					<div id="boosterpackPinDiv" class="row"></div>
-					<div id="extraPinDiv"></div>
+				<div id="boosterpackPinDiv" class="row"></div>
+				<div id="extraPinDiv"></div>
 			</div>
 		</div>
-		<!--
-			<h1 id="Reference" class="page-header">Reference</h1>
-			<h1 id="Graph" class="page-header">Graph</h1>
-		-->
+
+
+
+		<!-- Graph Modal -->
+		<!-- <div class="modal fade" id="GraphModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+						<h4 class="modal-title" id="myModalLabel">Analog Data</h4>
+					</div>
+					<div class="modal-body">
+						<div width="30%">
+							<canvas id="myChart" width="400" height="400"></canvas>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div> --> <!-- /Graph Modal -->
+	</div>
+	<section id="Graph" name="Graph"></section>
+	<div id="graphwrap">
+		<div class="container">
+			<div id="chartDiv" width="30%">
+				<canvas id="myChart" width="400" height="400"></canvas>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

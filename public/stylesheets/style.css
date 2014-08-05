@@ -58,3 +58,13 @@ body {
 .btnInput.btnOutput.btnPWM, .btnInput.btnOutput.btnServo{   
 	background:purple; /*purple*/
 }
+
+/* Graph Section */
+#graphwrap {
+	margin-top: 100px;
+	background: black;
+}
+
+#chartDiv {
+	margin: 50px;
+}
